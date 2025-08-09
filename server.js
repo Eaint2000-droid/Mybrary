@@ -7,15 +7,19 @@ if (process.env.NODE_ENV !== 'production') {
 const express = require('express')// Import Express framework
 const app = express() // Create an Express application instance
 const expressLayouts = require('express-ejs-layouts') // Import express-ejs-layouts middleware for layout support in EJS
+const bodyParser = require('body-parser') // Import the body-parser module to parse incoming request bodies
 
-const indexRouter = require('./routes/index')// Import the router from 'routes/index.js' to handle routing
+// Import the routers to handle routing
+const indexRouter = require('./routes/index') 
+const authorRouter = require('./routes/authors') 
 
 app.set('view engine', 'ejs') // Set EJS as the templating engine
 app.set('views', __dirname + '/views') // Set the directory for EJS view files
-app.set('layout', 'layouts/layout') // Set the default layout file for EJS layouts under ./views/layouts/
+app.set('layout', 'layouts/layout') // Set the default layout file for EJS layouts under ./views/layouts/ folder
 
 app.use(expressLayouts) // Enable express-ejs-layouts middleware
 app.use(express.static('public')) // Serve static files (like CSS, images, JS) from the 'public' folder
+app.use(bodyParser.urlencoded({ limit: '10mb', extended: false })) // Parse URL-encoded form data up to 10MB
 
 const mongoose = require('mongoose') // Import mongoose 
 mongoose.connect(process.env.DATABASE_URL) //Set up connection for database
@@ -29,6 +33,7 @@ db.on('error', error => console.log(error))
 // This runs once when the connection is successfully established
 db.once('open', () => console.log('Connected to Mongoose'))
 
-app.use('/', indexRouter)// Mount the imported router to handle all routes starting with '/'
+app.use('/', indexRouter) // Mount the imported router to handle all routes starting with '/'
+app.use('/authors', authorRouter) // Every route inside our author router will be prepended by the '/a
 
 app.listen(process.env.PORT || 3000)// Start the server on the specified environment port or default to 3000
