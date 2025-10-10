@@ -12,6 +12,7 @@ const bodyParser = require('body-parser') // Import the body-parser module to pa
 // Import the routers to handle routing
 const indexRouter = require('./routes/index') 
 const authorRouter = require('./routes/authors') 
+const bookRouter = require('./routes/books') 
 
 app.set('view engine', 'ejs') // Set EJS as the templating engine
 app.set('views', __dirname + '/views') // Set the directory for EJS view files
@@ -26,14 +27,16 @@ mongoose.connect(process.env.DATABASE_URL) //Set up connection for database
 const db = mongoose.connection // Get the default Mongoose connection object
 
 // Set up an event listener for connection errors
-// If there's an error while connecting to MongoDB, log it to the console
-db.on('error', error => console.log(error))
+// If there's an error while connecting to MongoDB, print it out to the console
+db.on('error', error => console.error(error))
 
 // Set up a one-time event listener for the 'open' event
 // This runs once when the connection is successfully established
+// Run only once when we open up the database for the first time
 db.once('open', () => console.log('Connected to Mongoose'))
 
 app.use('/', indexRouter) // Mount the imported router to handle all routes starting with '/'
-app.use('/authors', authorRouter) // Every route inside our author router will be prepended by the '/a
+app.use('/authors', authorRouter) // Every route inside our author router will be prepended by the '/authors'
+app.use('/books', bookRouter)
 
 app.listen(process.env.PORT || 3000)// Start the server on the specified environment port or default to 3000

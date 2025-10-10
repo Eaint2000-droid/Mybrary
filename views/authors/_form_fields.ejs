@@ -1,4 +1,11 @@
 <label>Name</label>
-<%# 'author.name' - inserts the value of author.name, escaping it for safety %>
-<%# 'author.name' - accesses the name property from the author object %>
+
 <input type="text" name="name" value="<%= author.name%>" />
+
+<!-- EXPLANATION --
+    When a form containing an <input> element is submitted, 
+    the 'name' attribute defines the key that will be sent to the server 
+    along with the input's value. The server receives these as name-value pairs 
+    So if author = { name: "Alice" }, then the input will render as:
+    <input type="text" name="name" value="Alice" /> 
+-->

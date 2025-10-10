@@ -1,0 +1,10 @@
+<h2>New Book</h2>
+<!-- enctype="multipart/form-data": 
+  enctype ==> encoding type used to submit form data to the server;
+  enctype="multipart/form-data" ==> tells the server that we will be sending 
+  a multipart data which could include file uploads -->
+<form action="/books" method="POST" enctype="multipart/form-data">
+  <%- include('_form_fields') %>
+  <a href="/books">Cancel</a>
+  <button type="submit">Create</button>
+</form>
