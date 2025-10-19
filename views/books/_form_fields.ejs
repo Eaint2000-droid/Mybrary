@@ -1,18 +1,18 @@
 <div>
   <label>Title</label>
-  <input type="text" name="title" value="<%= book.title %>" >
+  <input type="text" name="title" value="<%= book.title %>">
 </div>
 
 <div>
   <label>Author</label>
   <select name="author">
-    <% authors.forEach(author => { %> 
-      <% if (author.id === book.author) { %>
+    <% authors.forEach(author=> { %>
+      <% if (author.id===book.author) { %>
         <option selected label="<%= author.name %>" value="<%= author.id %>">
-      <% } else { %>
+          <% } else { %>
         <option label="<%= author.name %>" value="<%= author.id %>">
-      <% } %> 
-    <% }) %>
+          <% } %>
+            <% }) %>
   </select>
 </div>
 
@@ -23,8 +23,7 @@
     for e.g. if you have publishDate of '2019-09-19T12:23'
     then publishDate.toISOString().split('T')[0] will split it by 'T'
     and take the first index element which is '2019-09-19' -->
-  <input type="date" name="publishDate" 
-          value="<%= book.publishDate == null ? '' :
+  <input type="date" name="publishDate" value="<%= book.publishDate == null ? '' :
           book.publishDate.toISOString().split('T')[0] %>">
 </div>
 
@@ -33,10 +32,9 @@
   <input type="number" name="pageCount" min="1" value="<%= book.pageCount %>">
 </div>
 
-<div> <!-- name = "cover" instead of name = "coverImageName" because
-      here we are just focusing on the cover as a file and not the cover's name-->
+<div>
   <label>Cover</label>
-  <input type="file" name="cover">
+  <input type="file" name="cover" class="filepond">
 </div>
 
 

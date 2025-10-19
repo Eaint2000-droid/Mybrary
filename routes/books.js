@@ -1,29 +1,8 @@
 const express = require('express')
 const router = express.Router()
-const multer = require('multer')
-const path = require('path') // used for working with files and directory paths
-const fs = require('fs') // built-in node.js module to hand file system
 const Book = require('../models/book')
 const Author = require('../models/author')
-const uploadPath = path.join('public', Book.coverImageBasePath) // Set the upload directory path by joining 'public' with the cover image folder from the Book model
 const imageMimeTypes = ['image/jpeg', 'image/png', 'image/gif'] // Define the allowed MIME types for uploaded images (JPEG, PNG, GIF)
-
-// Configure multer for handling file uploads
-const upload = multer({
-    // Destination folder where uploaded files will be stored
-    dest: uploadPath,
-
-    // 'fileFilter' is a function that decides whether to accept or reject an uploaded file
-    // req → the incoming request.
-    // file → metadata about the uploaded file (file.mimetype, file.originalname, etc.).
-    // callback → used to tell Multer whether the file should be accepted.
-    fileFilter: (req, file, callback) => {
-        // Check if file type is in the allowed list and pass the result to the callback
-        callback(null, imageMimeTypes.includes(file.mimetype))
-        // If it’s valid, callback(null, true) → file accepted.
-        // If not, callback(null, false) → file rejected (not uploaded).
-    }
-})
 
 // All Books Route
 router.get('/', async (req, res) => {
@@ -72,42 +51,28 @@ router.get('/new', async (req, res) => {
 })
 
 // Create Book Route
-// accepts another parameter which will accepts a single file upload with a filename 'cover'
-router.post('/', upload.single('cover'), async (req, res) => {
-    const fileName = req.file != null ? req.file.filename : null
+// It constructs a new Book object from the request body, processes the cover image,
+// attempts to save the book, and redirects to the books list on success.
+// If saving fails, it re-renders the form with an error message.
+router.post('/', async (req, res) => {
     const book = new Book({
         title: req.body.title,
         author: req.body.author,
         publishDate: new Date(req.body.publishDate),
         pageCount: req.body.pageCount,
-        coverImageName: fileName,
         description: req.body.description
     })
+    
+    saveCover(book, req.body.cover)
 
     try{
         const newBook = await book.save()
         // res.redirect(`books/${newBook.id}`)
         res.redirect('/books') // sends an HTTP redirct to /books
     } catch {
-        // this if() condition is to make sure that the errorneous book doesn't 
-        // get saved into 'uploads' folder when the user pressed on 'Create'
-        // for e.g., let's say the user chooses not to leave the book cover image
-        // as blank and chooses to 'Create', then this book should not be saved into
-        // the uploads folder
-        if(book.coverImageName != null){
-            removeBookCover(book.coverImageName)
-        }
-
         renderNewPage(res, book, true)
     }
 })
-
-function removeBookCover(fileName){
-    // to remove the file from the uploadPath
-    fs.unlink(path.join(uploadPath, fileName), err => {
-        if (err) console.error(err)
-    })
-}
 
 async function renderNewPage(res, book, hasError = false){
     try {
@@ -127,5 +92,21 @@ async function renderNewPage(res, book, hasError = false){
         res.redirect('/books')
     }
 }
-  
+
+// Processes and saves the book's cover image data.
+function saveCover(book, coverEncoded) {
+    // If no encoded cover data is provided, exit the function early.
+    if (coverEncoded == null) return
+    // Parse the encoded cover data from JSON format into a JavaScript object.
+    const cover = JSON.parse(coverEncoded)
+    // If a valid cover exists and its MIME type is supported, process it.
+    if (cover != null && imageMimeTypes.includes(cover.type)) {
+        // Decodes the Base64 string (text form of image data) into binary and assign it to the book object
+        // so that it can be stored or processed properly in MongoDB
+        book.coverImage = Buffer.from(cover.data, 'base64')
+        // Store the image MIME type (e.g., 'image/jpeg', 'image/png') in the book.
+        book.coverImageType = cover.type
+    }
+}
+
 module.exports = router
