@@ -4,10 +4,12 @@ if (process.env.NODE_ENV !== 'production') {
     // This makes variables in .env available via process.env
     require('dotenv').config()
 }
+
 const express = require('express')// Import Express framework
 const app = express() // Create an Express application instance
 const expressLayouts = require('express-ejs-layouts') // Import express-ejs-layouts middleware for layout support in EJS
 const bodyParser = require('body-parser') // Import the body-parser module to parse incoming request bodies
+const methodOverride = require('method-override') // Import the method-override library to enable overriding HTTP verbs (e.g. use PUT/DELETE via forms)
 
 // Import the routers to handle routing
 const indexRouter = require('./routes/index') 
@@ -19,6 +21,7 @@ app.set('views', __dirname + '/views') // Set the directory for EJS view files
 app.set('layout', 'layouts/layout') // Set the default layout file for EJS layouts under ./views/layouts/ folder
 
 app.use(expressLayouts) // Enable express-ejs-layouts middleware
+app.use(methodOverride('_method')) // Allow override using a query param or a hidden input named "_method"
 app.use(express.static('public')) // Serve static files (like CSS, images, JS) from the 'public' folder
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: false })) // Parse URL-encoded form data up to 10MB
 
