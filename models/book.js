@@ -5,7 +5,7 @@ const mongoose = require('mongoose')
 // This specifies the structure of an Author document
 const bookSchema = new mongoose.Schema({
     title: {
-        type: String, 
+        type: String,
         required: true
     },
     description: {
@@ -19,16 +19,16 @@ const bookSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    createdAt:{
+    createdAt: {
         type: Date,
         required: true,
         default: Date.now
     },
-    coverImage:{
+    coverImage: {
         type: Buffer, // used for storing raw binary data e.g. images, audio or other files;
         required: true
     },
-    coverImageType:{
+    coverImageType: {
         type: String,
         required: true
     },
@@ -40,10 +40,10 @@ const bookSchema = new mongoose.Schema({
 })
 
 // create a virtual property 'coverImagePath' for the bookSchema
-bookSchema.virtual('coverImagePath').get(function(){
+bookSchema.virtual('coverImagePath').get(function () {
     // Check if the book has a cover image and coverimagetype
-    if(this.coverImage != null && this.coverImageType != null){
-         // Return a base64-encoded Data URL that can be rendered directly in <img src="...">
+    if (this.coverImage != null && this.coverImageType != null) {
+        // Return a base64-encoded Data URL that can be rendered directly in <img src="...">
         return `data:${this.coverImageType};charset=utf-8;base64,
         ${this.coverImage.toString('base64')}`
     }
